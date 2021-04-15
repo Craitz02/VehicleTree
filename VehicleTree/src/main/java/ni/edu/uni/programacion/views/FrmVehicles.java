@@ -8,9 +8,18 @@ package ni.edu.uni.programacion.views;
 import java.awt.BorderLayout;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.JComponent;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
+import ni.edu.uni.programacion.backend.dao.implementation.JsonVehicleDaoImpl;
+import ni.edu.uni.programacion.backend.pojo.Vehicle;
 import ni.edu.uni.programacion.controllers.PnlVehicleController;
 import ni.edu.uni.programacion.controllers.PnlVehicleShowController;
 import ni.edu.uni.programacion.views.panels.PnlShow;
@@ -26,12 +35,18 @@ public class FrmVehicles extends javax.swing.JFrame {
     private PnlShow pnlShow;
     private PnlVehicleShowController pnlShowController;
     private PnlVehicleController pnlVehicleController;
+    private JsonVehicleDaoImpl jsonVehicleDaoImpl;
 
     /**
      * Creates new form FrmVehicles
      */
     public FrmVehicles() {
         initComponents();
+        try {
+            jsonVehicleDaoImpl = new JsonVehicleDaoImpl();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FrmVehicles.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -47,6 +62,7 @@ public class FrmVehicles extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         btnNew = new javax.swing.JButton();
         btnView = new javax.swing.JButton();
+        btnReport = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         pnlBottom = new javax.swing.JPanel();
         pnlContent = new javax.swing.JPanel();
@@ -62,7 +78,6 @@ public class FrmVehicles extends javax.swing.JFrame {
         jPanel1.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         btnNew.setBackground(new java.awt.Color(0, 204, 204));
-        btnNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Webp.net-resizeimage (3).png"))); // NOI18N
         btnNew.setText("New");
         btnNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -72,7 +87,6 @@ public class FrmVehicles extends javax.swing.JFrame {
         jPanel1.add(btnNew);
 
         btnView.setBackground(new java.awt.Color(0, 204, 204));
-        btnView.setIcon(new javax.swing.ImageIcon("C:\\Users\\JADPA26\\Documents\\NetBeansProjects\\ClasePractica1\\ClasePractica1\\src\\main\\resources\\Webp.net-resizeimage (4).png")); // NOI18N
         btnView.setText("View");
         btnView.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -80,6 +94,15 @@ public class FrmVehicles extends javax.swing.JFrame {
             }
         });
         jPanel1.add(btnView);
+
+        btnReport.setBackground(new java.awt.Color(51, 255, 255));
+        btnReport.setText("Report");
+        btnReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReportActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnReport);
 
         jSplitPane1.setLeftComponent(jPanel1);
 
@@ -130,6 +153,24 @@ public class FrmVehicles extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnViewActionPerformed
 
+    private void btnReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportActionPerformed
+        try {
+            List<Vehicle> vehicles = jsonVehicleDaoImpl.getAll().stream().collect(Collectors.toList());
+            JRBeanCollectionDataSource collection = new JRBeanCollectionDataSource(vehicles);
+            String fileName = getClass().getResource("/reports/VehicleReport.jasper").getPath();
+            
+            JasperPrint print = JasperFillManager.fillReport(fileName, null, collection);
+            JasperViewer viewer = new JasperViewer(print);
+            viewer.setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(FrmVehicles.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JRException ex) {
+            Logger.getLogger(FrmVehicles.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }//GEN-LAST:event_btnReportActionPerformed
+
     private void addComponent(JComponent component) {
         pnlContent.removeAll();
         pnlContent.add(component, BorderLayout.CENTER);
@@ -174,6 +215,7 @@ public class FrmVehicles extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnNew;
+    private javax.swing.JButton btnReport;
     private javax.swing.JButton btnView;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
