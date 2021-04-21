@@ -16,8 +16,8 @@ import java.util.logging.Logger;
 public class FrmThreadDemo extends javax.swing.JFrame {
 
     private final int MAX = 100;
-    private final int MIN = 1;
-    private boolean State = true;
+    private int MIN = 1;
+    private boolean State;
 
     /**
      * Creates new form FrmThreadDemo
@@ -74,6 +74,11 @@ public class FrmThreadDemo extends javax.swing.JFrame {
         btnStop.setFont(new java.awt.Font("DialogInput", 1, 12)); // NOI18N
         btnStop.setForeground(new java.awt.Color(0, 0, 0));
         btnStop.setText("Stop");
+        btnStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStopActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnStop);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
@@ -92,13 +97,19 @@ public class FrmThreadDemo extends javax.swing.JFrame {
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         State = true;
+//        MIN = 1;
         new FillProgressBarProcess().start();
     }//GEN-LAST:event_btnStartActionPerformed
 
     private void btnPauseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPauseActionPerformed
        State = false;
-       new FillProgressBarProcess().start();
+//       new FillProgressBarProcess().start();
     }//GEN-LAST:event_btnPauseActionPerformed
+
+    private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
+        State = false;
+        MIN = 1;
+    }//GEN-LAST:event_btnStopActionPerformed
 
     public class FillProgressBarProcess extends Thread {
 
@@ -107,16 +118,16 @@ public class FrmThreadDemo extends javax.swing.JFrame {
 
         @Override
         public void run() {
-            int i = MIN;
-            while (State && i<=MAX) {                
+            
+            while (State && MIN<=MAX) {                
                 
-                pgbDemo.setValue(i);
+                pgbDemo.setValue(MIN);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(FrmThreadDemo.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                i++;
+                MIN++;
                 
             }
         }
